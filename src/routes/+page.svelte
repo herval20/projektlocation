@@ -12,18 +12,19 @@
     }
   }
 
-  function showPosition(position) {
+  async function showPosition(position) {
     latitude = position.coords.latitude;
     longitude = position.coords.longitude;
 
-    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`)
-      .then(response => response.json())
-      .then(data => {
-        country = data.address?.country || "Land konnte nicht ermittelt werden";
-      })
-      .catch(() => {
-        country = "Fehler bei der Abfrage";
-      });
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+      const data = await res.json();
+      console.log("JSON:", data);
+
+      country = data.address?.country || "Land konnte nicht ermittelt werden";
+    } catch (err) {
+      country = "Fehler bei der Abfrage";
+    }
   }
 
   function showError(error) {
@@ -32,8 +33,8 @@
 </script>
 
 <div class="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-green-600 p-6">
-  <div class="bg-white/100  p-8 rounded-2xl shadow-xl text-center max-w-md w-full">
-    <h1 class="text-3xl font-bold mb-6 text-blue-200"> Geolocation</h1>
+  <div class="bg-white/100 p-8 rounded-2xl shadow-xl text-center max-w-md w-full">
+    <h1 class="text-3xl font-bold mb-6 text-blue-200">Geolocation</h1>
 
     <button 
       on:click={getLocation}
@@ -45,11 +46,12 @@
     {#if errorMessage}
       <p class="text-red-300 mb-4">{errorMessage}</p>
     {/if}
+
     {#if latitude && longitude}
       <div class="mt-6 space-y-2">
-        <p class="text-white-700"><span class="font-semibold">Latitude:</span> {latitude}</p>
-        <p class="text-white-700"><span class="font-semibold">Longitude:</span> {longitude}</p>
-        <p class="text-white-700"><span class="font-semibold">Land:</span> {country}</p>
+        <p class="text-blue-500"><span class="font-semibold">Latitude:</span> {latitude}</p>
+        <p class="text-blue-500"><span class="font-semibold">Longitude:</span> {longitude}</p>
+        <p class="text-blue-500"><span class="font-semibold">Land:</span> {country}</p>
       </div>
     {/if}
   </div>
